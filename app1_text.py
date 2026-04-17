@@ -9,8 +9,8 @@ from datetime import datetime
 
 MODEL_PATH = "models/gesture_model.pkl"
 ENCODER_PATH = "models/label_encoder.pkl"
-CONFIDENCE_THR = 0.80      # minimum confidence to accept prediction
-COOLDOWN_SEC = 1.2         # seconds between accepted gestures
+CONFIDENCE_THR = 0.90      # minimum confidence to accept prediction
+COOLDOWN_SEC = 1.5         # seconds between accepted gestures
 SAVE_TRANSCRIPT = True     # save session text to a .txt file
 
 # Map gesture labels to special actions
