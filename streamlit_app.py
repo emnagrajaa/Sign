@@ -77,6 +77,31 @@ def load_artifacts():
     return model, label_encoder, mp_hands, mp_draw, hands
 
 
+def check_live_snapshot_support():
+    cv2, cv2_error = load_cv2()
+    if cv2 is None:
+        return (
+            "OpenCV is not available in this deployment runtime. "
+            f"Details: {cv2_error}"
+        )
+
+    mp, mp_error = load_mediapipe()
+    if mp is None:
+        return (
+            "MediaPipe failed to import in this deployment runtime. "
+            f"Details: {mp_error}"
+        )
+
+    if not hasattr(mp, "solutions") or not hasattr(mp.solutions, "hands"):
+        return (
+            "MediaPipe Hands is unavailable in this runtime. "
+            "On Streamlit Cloud, ensure runtime.txt contains 'python-3.12', "
+            "commit it to repo root, then reboot the app."
+        )
+
+    return None
+
+
 def normalize_keypoints(landmarks):
     kp = np.array([[lm.x, lm.y, lm.z] for lm in landmarks], dtype=np.float32)
     kp -= kp[0]
@@ -232,6 +257,17 @@ def render_launcher_tab():
 def render_live_tab():
     st.subheader("Live Confidence / FPS")
     st.write("Capture a webcam snapshot in the browser and run gesture inference with confidence and estimated FPS.")
+
+    support_error = check_live_snapshot_support()
+    if support_error:
+        st.error(support_error)
+        st.info(
+            "Fix on Streamlit Cloud:\n"
+            "1. Keep runtime.txt in repository root with: python-3.12\n"
+            "2. Commit/push changes\n"
+            "3. Reboot app (or clear cache + reboot)"
+        )
+        return
 
     camera_image = st.camera_input("Take a snapshot")
     if camera_image is None:
