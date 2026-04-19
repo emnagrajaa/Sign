@@ -28,14 +28,28 @@ def load_artifacts():
 
     model = joblib.load(MODEL_PATH)
     label_encoder = joblib.load(ENCODER_PATH)
+
+    if not hasattr(mp, "solutions"):
+        raise RuntimeError(
+            "MediaPipe was installed, but mp.solutions is unavailable in this runtime. "
+            "Use Python 3.12 on Streamlit Cloud (add runtime.txt with python-3.12)."
+        )
+
+    if not hasattr(mp.solutions, "hands"):
+        raise RuntimeError(
+            "MediaPipe Hands API is unavailable in this runtime. "
+            "Use Python 3.12 on Streamlit Cloud (runtime.txt: python-3.12)."
+        )
+
     mp_hands = mp.solutions.hands
+    mp_draw = mp.solutions.drawing_utils
     hands = mp_hands.Hands(
         static_image_mode=True,
         max_num_hands=1,
         min_detection_confidence=0.6,
         min_tracking_confidence=0.6,
     )
-    return model, label_encoder, mp_hands, hands
+    return model, label_encoder, mp_hands, mp_draw, hands
 
 
 def normalize_keypoints(landmarks):
@@ -68,7 +82,10 @@ def load_phase7_report():
 
 
 def run_snapshot_inference(image_bytes):
-    model, label_encoder, mp_hands, hands = load_artifacts()
+    try:
+        model, label_encoder, mp_hands, mp_draw, hands = load_artifacts()
+    except Exception as exc:
+        return None, None, None, str(exc)
 
     start = time.perf_counter()
 
@@ -92,7 +109,7 @@ def run_snapshot_inference(image_bytes):
         confidence = float(proba[pred_idx])
         prediction = label_encoder.inverse_transform([pred_idx])[0]
 
-        mp.solutions.drawing_utils.draw_landmarks(
+        mp_draw.draw_landmarks(
             frame_bgr,
             hand_landmarks,
             mp_hands.HAND_CONNECTIONS,

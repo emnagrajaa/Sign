@@ -14,7 +14,7 @@ from sklearn.model_selection import train_test_split
 DATA_CSV = "data/gestures.csv"
 MODEL_PATH = "models/gesture_model.pkl"
 ENCODER_PATH = "models/label_encoder.pkl"
-REPORT_PATH = "data/phase7_report.json"
+REPORT_PATH = "data/report.json"
 
 
 def evaluate_model(weak_class_f1_threshold=0.95):
@@ -65,7 +65,7 @@ def evaluate_model(weak_class_f1_threshold=0.95):
                 "distances, and hand orientations."
             )
 
-    print("\n=== Phase 7: Offline Model Quality Check ===")
+    print("\n=== Offline Model Quality Check ===")
     print(f"Samples: {len(df)} | Features: {X.shape[1]} | Classes: {len(class_names)}")
     print(f"Overall accuracy: {report_dict['accuracy'] * 100:.2f}%")
     print(f"Macro F1: {report_dict['macro avg']['f1-score']:.4f}")
@@ -127,7 +127,7 @@ def profile_live_fps(duration_sec=20, camera_index=0, width=960, height=540):
     infer_ms_acc = 0.0
     frame_ms_acc = 0.0
 
-    print("\n=== Phase 7: Live FPS Profiling ===")
+    print("\n=== Live FPS Profiling ===")
     print("Press Q to stop early.")
 
     while True:
@@ -184,7 +184,7 @@ def profile_live_fps(duration_sec=20, camera_index=0, width=960, height=540):
             (185, 185, 185),
             1,
         )
-        cv2.imshow("Phase7 FPS Profiler", frame)
+        cv2.imshow("Live FPS Profiler", frame)
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
@@ -209,7 +209,7 @@ def profile_live_fps(duration_sec=20, camera_index=0, width=960, height=540):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Phase 7 testing and profiling")
+    parser = argparse.ArgumentParser(description="Offline Model Quality Check")
     parser.add_argument(
         "--no-live",
         action="store_true",
