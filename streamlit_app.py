@@ -5,7 +5,6 @@ import time
 from pathlib import Path
 
 import joblib
-import mediapipe as mp
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -29,6 +28,16 @@ def load_cv2():
 
 
 @st.cache_resource
+def load_mediapipe():
+    try:
+        import mediapipe as mp
+
+        return mp, None
+    except Exception as exc:
+        return None, str(exc)
+
+
+@st.cache_resource
 def load_artifacts():
     if not MODEL_PATH.exists():
         raise FileNotFoundError(f"Missing model file: {MODEL_PATH}")
@@ -37,6 +46,13 @@ def load_artifacts():
 
     model = joblib.load(MODEL_PATH)
     label_encoder = joblib.load(ENCODER_PATH)
+
+    mp, mp_error = load_mediapipe()
+    if mp is None:
+        raise RuntimeError(
+            "MediaPipe failed to import in this runtime. "
+            f"Details: {mp_error}"
+        )
 
     if not hasattr(mp, "solutions"):
         raise RuntimeError(
