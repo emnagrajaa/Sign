@@ -17,7 +17,7 @@ A real-time hand gesture recognition system that translates hand gestures captur
 
 ---
 
-## 🗂️ Project Structure
+## Project Structure
 
 ```
 .
