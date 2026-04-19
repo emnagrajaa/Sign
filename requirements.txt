@@ -19,9 +19,9 @@ numpy==2.3.5
 opencv-contrib-python==4.10.0.84
 packaging==26.1
 pandas==3.0.2
-pillow==12.2.0
+pillow==11.1.0
 pycparser==3.0
-pygame==2.6.1
+pygame==2.6.1; platform_system == "Windows"
 pyparsing==3.3.2
 pypiwin32==223; platform_system == "Windows"
 python-dateutil==2.9.0.post0
@@ -31,7 +31,7 @@ requests==2.33.1
 scikit-learn==1.8.0
 scipy==1.17.1
 six==1.17.0
-sounddevice==0.5.5
+sounddevice==0.5.5; platform_system == "Windows"
 streamlit==1.40.2
 threadpoolctl==3.6.0
 tzdata==2026.1
