@@ -4,7 +4,6 @@ import subprocess
 import time
 from pathlib import Path
 
-import cv2
 import joblib
 import mediapipe as mp
 import numpy as np
@@ -17,6 +16,16 @@ ENCODER_PATH = ROOT / "models" / "label_encoder.pkl"
 REPORT_PATH = ROOT / "data" / "report.json"
 TEXT_APP = ROOT / "app1_text.py"
 SPEECH_APP = ROOT / "app2_speech.py"
+
+
+@st.cache_resource
+def load_cv2():
+    try:
+        import cv2  # Local import to avoid app-wide crash if OpenCV native module fails.
+
+        return cv2, None
+    except Exception as exc:
+        return None, str(exc)
 
 
 @st.cache_resource
@@ -82,6 +91,16 @@ def load_phase7_report():
 
 
 def run_snapshot_inference(image_bytes):
+    cv2, cv2_error = load_cv2()
+    if cv2 is None:
+        return (
+            None,
+            None,
+            None,
+            "OpenCV failed to load in this runtime. "
+            f"Details: {cv2_error}",
+        )
+
     try:
         model, label_encoder, mp_hands, mp_draw, hands = load_artifacts()
     except Exception as exc:
