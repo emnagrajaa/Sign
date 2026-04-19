@@ -1,6 +1,7 @@
 import json
 import os
 import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -115,10 +116,19 @@ def launch_script(script_path):
     if not script_path.exists():
         return None, f"Script not found: {script_path}"
     try:
-        proc = subprocess.Popen(["python", str(script_path)], cwd=str(ROOT))
+        proc = subprocess.Popen([sys.executable, str(script_path)], cwd=str(ROOT))
         return proc, None
     except Exception as exc:
         return None, str(exc)
+
+
+def desktop_launch_supported():
+    # app1_text.py/app2_speech.py use OpenCV GUI windows, which require a desktop display.
+    if os.name == "nt":
+        return True, ""
+    if os.getenv("DISPLAY"):
+        return True, ""
+    return False, "Desktop launch is disabled in headless/cloud environments."
 
 
 def load_phase7_report():
@@ -207,6 +217,15 @@ def run_snapshot_inference(image_bytes):
 def render_launcher_tab():
     st.subheader("Launch Modes")
     st.write("Open existing real-time desktop apps from the browser UI.")
+
+    supported, reason = desktop_launch_supported()
+    if not supported:
+        st.warning(reason)
+        st.info(
+            "Use the Live Snapshot tab in Streamlit Cloud. "
+            "For full webcam desktop modes, run app1_text.py/app2_speech.py locally."
+        )
+        return
 
     if "text_proc" not in st.session_state:
         st.session_state.text_proc = None
